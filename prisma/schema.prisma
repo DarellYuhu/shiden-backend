@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Handler {
+  id   String @id @default(uuid())
+  name String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  account   Account[]
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  signature String? // description
+  platform  Platform
+  followers Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  handlerId String
+  avatarId  Int?
+
+  handler         Handler           @relation(fields: [handlerId], references: [id])
+  avatar          File?             @relation(fields: [avatarId], references: [id])
+  accountNiche    AccountNiche[]
+  CategoryAccount CategoryAccount[]
+}
+
+model AccountNiche {
+  accountId String
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  nicheId   Int
+  niche     Niche   @relation(fields: [nicheId], references: [id])
+
+  @@unique(name: "accountNiche", [accountId, nicheId])
+}
+
+model Niche {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  accountNiche AccountNiche[]
+}
+
+model CategoryAccount {
+  accountId  String
+  categoryId String
+
+  account  Account  @relation(fields: [accountId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([accountId, categoryId])
+}
+
+model Category {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  CategoryAccount CategoryAccount[]
+}
+
+model Content {
+  id              String     @id
+  link            String
+  duration        Int?
+  createTime      DateTime?
+  description     String?
+  prodComplexity  Int?
+  messageEmbeding Int?
+  coverId         Int?
+  cover           File?      @relation(fields: [coverId], references: [id])
+  statistic       Statistic?
+}
+
+model Statistic {
+  contentId String  @unique
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  comment   Int
+  like      Int
+  download  Int
+  play      Int
+  share     Int
+  forward   Int
+}
+
+model File {
+  id       Int    @id @default(autoincrement())
+  filename String
+  bucket   String
+  path     String
+  fullPath String
+  mimeType String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  content   Content[]
+  account   Account[]
+}
+
+enum Platform {
+  TIKTOK
+  FACEBOOK
+  INSTAGRAM
+  X
+}
