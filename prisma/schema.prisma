@@ -15,37 +15,38 @@ datasource db {
 }
 
 model Handler {
-  id   String @id @default(uuid())
-  name String
+  id          String  @id @default(uuid())
+  name        String
+  description String?
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  account   Account[]
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  account   PlatformAccount[]
 }
 
-model Account {
+model PlatformAccount {
   id        String   @id @default(uuid())
   username  String   @unique
-  signature String? // description
+  signature String? // something like account bio
   platform  Platform
   followers Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  handlerId String
+  handlerId String?
   avatarId  Int?
 
-  handler         Handler           @relation(fields: [handlerId], references: [id])
+  handler         Handler?          @relation(fields: [handlerId], references: [id])
   avatar          File?             @relation(fields: [avatarId], references: [id])
   accountNiche    AccountNiche[]
-  CategoryAccount CategoryAccount[]
+  categoryAccount CategoryAccount[]
 }
 
 model AccountNiche {
   accountId String
-  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account   PlatformAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
   nicheId   Int
-  niche     Niche   @relation(fields: [nicheId], references: [id])
+  niche     Niche           @relation(fields: [nicheId], references: [id])
 
   @@unique(name: "accountNiche", [accountId, nicheId])
 }
@@ -64,8 +65,8 @@ model CategoryAccount {
   accountId  String
   categoryId String
 
-  account  Account  @relation(fields: [accountId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
+  account  PlatformAccount @relation(fields: [accountId], references: [id])
+  category Category        @relation(fields: [categoryId], references: [id])
 
   @@unique([accountId, categoryId])
 }
@@ -112,10 +113,10 @@ model File {
   fullPath String
   mimeType String
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
   content   Content[]
-  account   Account[]
+  account   PlatformAccount[]
 }
 
 enum Platform {
