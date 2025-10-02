@@ -1,3 +1,6 @@
+auth-migrate:
+	bunx @better-auth/cli@latest migrate
+
 db-generate:
 	bunx prisma generate
 
