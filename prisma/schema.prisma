@@ -37,8 +37,9 @@ model PlatformAccount {
   userId   String?
   avatarId Int?
 
-  user   User? @relation(fields: [userId], references: [id])
-  avatar File? @relation(fields: [avatarId], references: [id])
+  user   User?  @relation(fields: [userId], references: [id])
+  avatar File?  @relation(fields: [avatarId], references: [id])
+  feed   Feed[]
 }
 
 model Thread {
@@ -61,7 +62,8 @@ model ThreadMember {
   isEnabled Boolean    @default(true)
 
   user   User   @relation(fields: [userId], references: [id])
-  thread Thread @relation(fields: [threadId], references: [id])
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  feed   Feed[]
 
   @@unique([userId, threadId])
 }
@@ -71,29 +73,36 @@ model Source {
   workgroupName String
   workgroupId   String
 
-  thread Thread @relation(fields: [threadId], references: [id])
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
   threadId String
 }
 
 model Feed {
-  id                String   @id
+  id String @id
+
   threadMemberId    String
   platformAccountId String?
-  contentId         String?
-  content           Content? @relation(fields: [contentId], references: [id])
+  contentMeta       Json
+
+  threadMember    ThreadMember     @relation(fields: [threadMemberId], references: [id])
+  platformAccount PlatformAccount? @relation(fields: [platformAccountId], references: [id])
+  content         Content[]
 }
 
 model Content {
-  id          String     @id
+  id          String    @id
   link        String
   duration    Int?
   createTime  DateTime?
   description String?
-  coverId     Int?
-  cover       File?      @relation(fields: [coverId], references: [id])
-  statistic   Statistic?
-  feed        Feed[]
+
+  coverId Int?
+  feedId  String
+
+  statistic Statistic?
+  cover     File?      @relation(fields: [coverId], references: [id])
+  feed      Feed       @relation(fields: [feedId], references: [id])
 }
 
 model Statistic {
