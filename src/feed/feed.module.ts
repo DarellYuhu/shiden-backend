@@ -4,7 +4,7 @@ import { FeedController } from './feed.controller';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule.register({ baseURL: process.env.SENTO_BASE_URL })],
   controllers: [FeedController],
   providers: [FeedService],
 })

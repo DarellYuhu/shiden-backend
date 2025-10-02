@@ -21,7 +21,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  account PlatformAccount[]
+  account      PlatformAccount[]
+  threadMember ThreadMember[]
 }
 
 model PlatformAccount {
@@ -43,43 +44,67 @@ model PlatformAccount {
 model Thread {
   id          String   @id @default(uuid())
   name        String
+  isPublic    Boolean  @default(false)
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  threadMember ThreadMember[]
+  source       Source[]
+}
+
+model ThreadMember {
+  id        String     @id @default(uuid())
+  userId    String
+  threadId  String
+  role      ThreadRole @default(USER)
+  isEnabled Boolean    @default(true)
+
+  user   User   @relation(fields: [userId], references: [id])
+  thread Thread @relation(fields: [threadId], references: [id])
+
+  @@unique([userId, threadId])
 }
 
 model Source {
-  id          String   @id @default(uuid())
-  workgroupId String
-  platform    Platform
+  id            String @id @default(uuid())
+  workgroupName String
+  workgroupId   String
+
+  thread Thread @relation(fields: [threadId], references: [id])
+
+  threadId String
 }
 
 model Feed {
-  id String @id
+  id                String   @id
+  threadMemberId    String
+  platformAccountId String?
+  contentId         String?
+  content           Content? @relation(fields: [contentId], references: [id])
 }
 
 model Content {
-  id              String     @id
-  link            String
-  duration        Int?
-  createTime      DateTime?
-  description     String?
-  prodComplexity  Int?
-  messageEmbeding Int?
-  coverId         Int?
-  cover           File?      @relation(fields: [coverId], references: [id])
-  statistic       Statistic?
+  id          String     @id
+  link        String
+  duration    Int?
+  createTime  DateTime?
+  description String?
+  coverId     Int?
+  cover       File?      @relation(fields: [coverId], references: [id])
+  statistic   Statistic?
+  feed        Feed[]
 }
 
 model Statistic {
+  view    Int
+  like    Int
+  comment Int
+  share   Int
+  other   Json?
+
   contentId String  @unique
   content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  comment   Int
-  like      Int
-  download  Int
-  play      Int
-  share     Int
-  forward   Int
 }
 
 model File {
@@ -101,4 +126,10 @@ enum Platform {
   FACEBOOK
   INSTAGRAM
   X
+}
+
+enum ThreadRole {
+  ADMIN
+  OWNER
+  USER
 }
