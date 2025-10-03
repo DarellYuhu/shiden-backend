@@ -14,4 +14,5 @@ export const auth = betterAuth({
     enabled: true,
   },
   plugins: [username(), openAPI()],
+  trustedOrigins: ['http://localhost:3001'],
 });

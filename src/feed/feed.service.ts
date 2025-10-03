@@ -5,6 +5,7 @@ import { Prisma } from 'generated/prisma';
 import { shuffle } from 'lodash';
 import { lastValueFrom } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { subHours } from 'date-fns';
 
 @Injectable()
 export class FeedService {
@@ -15,7 +16,14 @@ export class FeedService {
     private prisma: PrismaService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS, { name: 'fetch-feeds-scheduler' })
+  async autoRemoveFeeds() {
+    const sixtyHourAgo = subHours(new Date(), 60);
+    await this.prisma.feed.deleteMany({
+      where: { content: { is: null }, updatedAt: { lt: sixtyHourAgo } },
+    });
+  }
+
+  @Cron(CronExpression.EVERY_10_MINUTES, { name: 'fetch-feeds-scheduler' })
   async getFeeds() {
     if (this.NODE_ENV === 'development')
       this.scheduler.deleteCronJob('fetch-feeds-scheduler');

@@ -12,12 +12,14 @@ import { AuthHook } from './core/auth/auth.hook';
 import { UserService } from './user/user.service';
 import { ThreadModule } from './thread/thread.module';
 import { APP_GUARD } from '@nestjs/core';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     PrismaModule,
     AccountModule,
     FeedModule,
+    UserModule,
     AuthModule.forRoot(auth),
     MulterModule.register({ limits: { fileSize: 5 * 1024 * 1024 } }),
     ScheduleModule.forRoot(),

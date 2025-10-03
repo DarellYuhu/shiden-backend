@@ -79,15 +79,17 @@ model Source {
 }
 
 model Feed {
-  id String @id
+  id          String   @id
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  contentMeta Json
 
   threadMemberId    String
   platformAccountId String?
-  contentMeta       Json
 
   threadMember    ThreadMember     @relation(fields: [threadMemberId], references: [id])
   platformAccount PlatformAccount? @relation(fields: [platformAccountId], references: [id])
-  content         Content[]
+  content         Content?
 }
 
 model Content {
@@ -98,7 +100,7 @@ model Content {
   description String?
 
   coverId Int?
-  feedId  String
+  feedId  String @unique
 
   statistic Statistic?
   cover     File?      @relation(fields: [coverId], references: [id])
