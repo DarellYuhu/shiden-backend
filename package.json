@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "bun build src/main -e @nestjs/microservices -e class-validator -e class-transformer -e @nestjs/core --target bun --outdir dist",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "bun --watch run src/main",
@@ -50,6 +50,7 @@
     "@nestjs/testing": "^11.0.1",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.7",
+    "@types/bun": "^1.2.23",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.20",

@@ -12,3 +12,6 @@ compose-up:
 
 compose-down:
 	docker compose down
+
+docker-build:
+	docker build -t darellyuhu/shiden-backend:latest .
