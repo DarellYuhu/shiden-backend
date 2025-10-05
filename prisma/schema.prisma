@@ -65,7 +65,7 @@ model ThreadMember {
   thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   feed   Feed[]
 
-  @@unique([userId, threadId])
+  @@unique(name: "thread_member_unique", [userId, threadId])
 }
 
 model Source {
@@ -87,7 +87,7 @@ model Feed {
   threadMemberId    String
   platformAccountId String?
 
-  threadMember    ThreadMember     @relation(fields: [threadMemberId], references: [id])
+  threadMember    ThreadMember     @relation(fields: [threadMemberId], references: [id], onDelete: Cascade)
   platformAccount PlatformAccount? @relation(fields: [platformAccountId], references: [id])
   content         Content?
 }

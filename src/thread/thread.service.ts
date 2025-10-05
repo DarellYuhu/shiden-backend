@@ -31,6 +31,16 @@ export class ThreadService {
     });
   }
 
+  async findOne(id: string) {
+    return this.prisma.thread.findUniqueOrThrow({ where: { id } });
+  }
+
+  async findMany(userId: string) {
+    return this.prisma.thread.findMany({
+      where: { threadMember: { some: { userId } } },
+    });
+  }
+
   private async checkSources(ids: string[]) {
     const result = await Promise.allSettled(
       ids.map(async (id) => {
@@ -42,6 +52,8 @@ export class ThreadService {
         return { workgroupId: data.data.id, workgroupName: data.data.name };
       }),
     );
+    const rejected = result.filter((res) => res.status === 'rejected');
+    if (rejected[0]) console.log(rejected[0]);
     const filtered = result
       .filter((res) => res.status === 'fulfilled')
       .map((item) => item.value);

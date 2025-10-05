@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { Prisma } from 'generated/prisma';
 import { shuffle } from 'lodash';
@@ -10,20 +10,30 @@ import { subHours } from 'date-fns';
 @Injectable()
 export class FeedService {
   private NODE_ENV = process.env.NODE_ENV;
+  private logger = new Logger(FeedService.name);
   constructor(
     private scheduler: SchedulerRegistry,
     private http: HttpService,
     private prisma: PrismaService,
   ) {}
 
+  findMany(threadId: string, userId: string) {
+    return this.prisma.feed.findMany({
+      where: { threadMember: { threadId, userId } },
+    });
+  }
+
+  @Cron(CronExpression.EVERY_HOUR, { name: 'auto-remove-feeds-scheduler' })
   async autoRemoveFeeds() {
+    if (this.NODE_ENV === 'development')
+      this.scheduler.deleteCronJob('auto-remove-feeds-scheduler');
     const sixtyHourAgo = subHours(new Date(), 60);
     await this.prisma.feed.deleteMany({
       where: { content: { is: null }, updatedAt: { lt: sixtyHourAgo } },
     });
   }
 
-  @Cron(CronExpression.EVERY_10_MINUTES, { name: 'fetch-feeds-scheduler' })
+  @Cron(CronExpression.EVERY_HOUR, { name: 'fetch-feeds-scheduler' })
   async getFeeds() {
     if (this.NODE_ENV === 'development')
       this.scheduler.deleteCronJob('fetch-feeds-scheduler');
@@ -32,6 +42,7 @@ export class FeedService {
     for (const [k, v] of groupedContent) {
       await this.distributeContent(k, v);
     }
+    this.logger.log('Scheduler Executed Successfuly');
   }
 
   private async distributeContent(workgroupId: string, contents: Content[]) {
