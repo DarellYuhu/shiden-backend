@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
 
@@ -18,5 +18,10 @@ export class FeedController {
   getFeeds() {
     this.feedService.getFeeds();
     return { message: 'Scheduler triggered' };
+  }
+
+  @Get(':id/download')
+  donwload(@Param('id') id: string) {
+    return this.feedService.download(id);
   }
 }
