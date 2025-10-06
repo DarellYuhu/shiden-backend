@@ -19,7 +19,7 @@ export class FeedService {
 
   findMany(threadId: string, userId: string) {
     return this.prisma.feed.findMany({
-      where: { threadMember: { threadId, userId } },
+      where: { threadMember: { threadId, userId }, content: { is: null } },
     });
   }
 

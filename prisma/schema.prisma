@@ -94,15 +94,14 @@ model Feed {
 }
 
 model Content {
-  id          String    @id
+  id          String    @id @default(uuid())
   link        String
-  duration    Int?
   createTime  DateTime?
   description String?
 
   coverId           Int?
   feedId            String @unique
-  platformAccountId String @unique
+  platformAccountId String
 
   statistic       Statistic?
   cover           File?           @relation(fields: [coverId], references: [id])
