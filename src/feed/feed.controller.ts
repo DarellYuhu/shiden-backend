@@ -1,10 +1,14 @@
 import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import { FeedScheduler } from './feed.scheduler';
 
 @Controller('feeds')
 export class FeedController {
-  constructor(private readonly feedService: FeedService) {}
+  constructor(
+    private readonly feedService: FeedService,
+    private readonly feedScheduler: FeedScheduler,
+  ) {}
 
   @Get()
   findMany(
@@ -16,7 +20,7 @@ export class FeedController {
 
   @Post('trigger-scheduler')
   getFeeds() {
-    this.feedService.getFeeds();
+    this.feedScheduler.getFeeds();
     return { message: 'Scheduler triggered' };
   }
 
