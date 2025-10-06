@@ -1,5 +1,5 @@
 import { betterAuth } from 'better-auth';
-import { username, openAPI } from 'better-auth/plugins';
+import { username, openAPI, admin } from 'better-auth/plugins';
 import { Pool } from 'pg';
 
 export const auth = betterAuth({
@@ -13,6 +13,6 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [username(), openAPI()],
+  plugins: [username(), openAPI(), admin()],
   trustedOrigins: ['http://localhost:3001'],
 });

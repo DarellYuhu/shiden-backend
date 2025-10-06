@@ -34,12 +34,13 @@ model PlatformAccount {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId   String?
+  userId   String
   avatarId Int?
 
-  user   User?  @relation(fields: [userId], references: [id])
-  avatar File?  @relation(fields: [avatarId], references: [id])
-  feed   Feed[]
+  user    User      @relation(fields: [userId], references: [id])
+  avatar  File?     @relation(fields: [avatarId], references: [id])
+  feed    Feed[]
+  content Content[]
 }
 
 model Thread {
@@ -99,12 +100,14 @@ model Content {
   createTime  DateTime?
   description String?
 
-  coverId Int?
-  feedId  String @unique
+  coverId           Int?
+  feedId            String @unique
+  platformAccountId String @unique
 
-  statistic Statistic?
-  cover     File?      @relation(fields: [coverId], references: [id])
-  feed      Feed       @relation(fields: [feedId], references: [id])
+  statistic       Statistic?
+  cover           File?           @relation(fields: [coverId], references: [id])
+  feed            Feed            @relation(fields: [feedId], references: [id])
+  platformAccount PlatformAccount @relation(fields: [platformAccountId], references: [id])
 }
 
 model Statistic {

@@ -1,3 +1,6 @@
+auth-generate:
+	bunx @better-auth/cli@latest generate
+
 auth-migrate:
 	bunx @better-auth/cli@latest migrate
 

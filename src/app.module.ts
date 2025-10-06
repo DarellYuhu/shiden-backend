@@ -14,6 +14,7 @@ import { ThreadModule } from './thread/thread.module';
 import { APP_GUARD } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { MinioModule } from './core/minio/minio.module';
+import { PlatformAccountModule } from './platform-account/platform-account.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MinioModule } from './core/minio/minio.module';
     FeedModule,
     UserModule,
     ThreadModule,
+    PlatformAccountModule,
     MinioModule,
     AuthModule.forRoot(auth),
     MulterModule.register({ limits: { fileSize: 5 * 1024 * 1024 } }),

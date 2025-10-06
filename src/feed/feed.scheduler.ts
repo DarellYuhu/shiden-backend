@@ -32,13 +32,13 @@ export class FeedScheduler {
     });
   }
 
-  @Cron(CronExpression.EVERY_5_SECONDS, {
+  @Cron(CronExpression.EVERY_HOUR, {
     name: 'fetch-feeds-scheduler',
     waitForCompletion: true,
   })
   async getFeeds() {
-    if (this.NODE_ENV === 'development')
-      this.scheduler.deleteCronJob('fetch-feeds-scheduler');
+    // if (this.NODE_ENV === 'development')
+    //   this.scheduler.deleteCronJob('fetch-feeds-scheduler');
     const { data } = await lastValueFrom(this.http.get<Content[]>('/contents'));
     const groupedContent = await this.groupBySource(data);
     for (const [k, v] of groupedContent) {
