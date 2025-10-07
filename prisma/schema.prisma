@@ -107,6 +107,17 @@ model Content {
   cover           File?           @relation(fields: [coverId], references: [id])
   feed            Feed            @relation(fields: [feedId], references: [id])
   platformAccount PlatformAccount @relation(fields: [platformAccountId], references: [id])
+  contentFile     ContentFile[]
+}
+
+model ContentFile {
+  contentId String
+  fileId    Int    @unique
+
+  content Content @relation(fields: [contentId], references: [id])
+  file    File    @relation(fields: [fileId], references: [id])
+
+  @@unique([contentId, fileId])
 }
 
 model Statistic {
@@ -121,17 +132,18 @@ model Statistic {
 }
 
 model File {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   filename String
   bucket   String
   path     String
-  fullPath String
-  mimeType String
+  fullPath String  @unique
+  mimeType String?
 
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  content   Content[]
-  account   PlatformAccount[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  content     Content[]
+  account     PlatformAccount[]
+  contentFile ContentFile?
 }
 
 enum Platform {

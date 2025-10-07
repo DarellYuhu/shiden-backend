@@ -6,6 +6,9 @@ import { MinioService } from 'src/core/minio/minio.service';
 import { PassThrough, Readable } from 'stream';
 import archiver from 'archiver';
 import { Content } from 'types';
+import { GetFeedQueryDto } from './dto/get-feed-query.dto';
+import { Prisma } from 'generated/prisma';
+import { subDays } from 'date-fns';
 
 @Injectable()
 export class FeedService {
@@ -17,9 +20,19 @@ export class FeedService {
     private minio: MinioService,
   ) {}
 
-  findMany(threadId: string, userId: string) {
+  findMany(userId: string, query: GetFeedQueryDto) {
+    const where: Prisma.FeedWhereInput = {
+      threadMember: { threadId: query.thread_id, userId },
+      content: { is: null },
+    };
+    if (query.less_than) {
+      const time = subDays(new Date(), parseInt(query.less_than));
+      where.updatedAt = { gte: time };
+    }
     return this.prisma.feed.findMany({
-      where: { threadMember: { threadId, userId }, content: { is: null } },
+      where,
+      take: query.limit,
+      orderBy: { createdAt: 'desc' },
     });
   }
 

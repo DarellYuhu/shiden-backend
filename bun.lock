@@ -21,6 +21,7 @@
         "convert-csv-to-json": "^3.10.0",
         "csv-parse": "^6.1.0",
         "date-fns": "^4.1.0",
+        "file-type": "^21.0.0",
         "lodash": "^4.17.21",
         "minio": "^8.0.6",
         "nestjs-zod": "^5.0.1",

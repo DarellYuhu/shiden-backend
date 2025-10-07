@@ -2,6 +2,7 @@ import { Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
 import { FeedScheduler } from './feed.scheduler';
+import { GetFeedQueryDto } from './dto/get-feed-query.dto';
 
 @Controller('feeds')
 export class FeedController {
@@ -11,11 +12,8 @@ export class FeedController {
   ) {}
 
   @Get()
-  findMany(
-    @Session() session: UserSession,
-    @Query('thread_id') threadId: string,
-  ) {
-    return this.feedService.findMany(threadId, session.user.id);
+  findMany(@Query() query: GetFeedQueryDto, @Session() session: UserSession) {
+    return this.feedService.findMany(session.user.id, query);
   }
 
   @Post('trigger-scheduler')
