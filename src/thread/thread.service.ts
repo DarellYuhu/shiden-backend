@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
+import { AddMembersDto } from './dto/add-members-dto';
 
 @Injectable()
 export class ThreadService {
@@ -38,6 +39,35 @@ export class ThreadService {
   async findMany(userId: string) {
     return this.prisma.thread.findMany({
       where: { threadMember: { some: { userId } } },
+    });
+  }
+
+  async threadMembers(threadId: string) {
+    const { threadMember, ...rest } = await this.prisma.thread
+      .findUniqueOrThrow({
+        where: { id: threadId },
+        include: {
+          threadMember: {
+            include: { user: { select: { name: true } } },
+          },
+        },
+      })
+      .catch(() => {
+        throw new NotFoundException('Thread not found');
+      });
+    return {
+      ...rest,
+      members: threadMember.map(({ user, ...rest }) => ({
+        ...rest,
+        name: user.name,
+      })),
+    };
+  }
+
+  async addMembers(threadId: string, payload: AddMembersDto) {
+    return this.prisma.threadMember.createMany({
+      data: payload.map((item) => ({ userId: item.id, threadId })),
+      skipDuplicates: true,
     });
   }
 
