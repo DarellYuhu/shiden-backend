@@ -15,6 +15,7 @@ import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { parse } from 'csv-parse/sync';
 import { AddMembersSchema } from './dto/add-members-dto';
+import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 
 @Controller('threads')
 export class ThreadController {
@@ -64,5 +65,14 @@ export class ThreadController {
       throw new BadRequestException('Invalid data!');
     });
     return this.threadService.addMembers(id, valid);
+  }
+
+  @Post(':id/broadcast')
+  createThread(
+    @Param('id') id: string,
+    @Session() session: UserSession,
+    @Body() payload: CreateBroadcastDto,
+  ) {
+    return this.threadService.createBroadcast(id, session.user.id, payload);
   }
 }

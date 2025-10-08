@@ -4,6 +4,7 @@ import { CreateThreadDto } from './dto/create-thread.dto';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { AddMembersDto } from './dto/add-members-dto';
+import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 
 @Injectable()
 export class ThreadService {
@@ -29,6 +30,16 @@ export class ThreadService {
           },
         },
       },
+    });
+  }
+
+  createBroadcast(
+    threadId: string,
+    ownerId: string,
+    payload: CreateBroadcastDto,
+  ) {
+    return this.prisma.broadcast.create({
+      data: { ...payload, threadId, ownerId },
     });
   }
 

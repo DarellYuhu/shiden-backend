@@ -18,6 +18,12 @@ export class UserService {
     return this.prisma.user.create({ data });
   }
 
+  getBroadcast(userId: string) {
+    return this.prisma.broadcast.findMany({
+      where: { thread: { threadMember: { some: { userId } } } },
+    });
+  }
+
   async statistics(userId: string) {
     const accounts = this.prisma.platformAccount.aggregate({
       where: { userId },

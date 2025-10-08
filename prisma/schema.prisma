@@ -23,6 +23,7 @@ model User {
 
   account      PlatformAccount[]
   threadMember ThreadMember[]
+  broadcast    Broadcast[]
 }
 
 model PlatformAccount {
@@ -53,6 +54,22 @@ model Thread {
 
   threadMember ThreadMember[]
   source       Source[]
+  broadcast    Broadcast[]
+}
+
+model Broadcast {
+  id        Int            @id @default(autoincrement())
+  message   String
+  link      String?
+  type      BroadcastType?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  ownerId  String
+  threadId String
+
+  thread Thread @relation(fields: [threadId], references: [id])
+  onwer  User   @relation(fields: [ownerId], references: [id])
 }
 
 model ThreadMember {
@@ -159,4 +176,10 @@ enum ThreadRole {
   ADMIN
   OWNER
   USER
+}
+
+enum BroadcastType {
+  ENGAGE
+  REPORT
+  SHARE
 }
