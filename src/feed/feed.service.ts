@@ -20,7 +20,7 @@ export class FeedService {
     private minio: MinioService,
   ) {}
 
-  findMany(userId: string, query: GetFeedQueryDto) {
+  findMany(userId: string, { limit = 10, ...query }: GetFeedQueryDto) {
     const where: Prisma.FeedWhereInput = {
       threadMember: { threadId: query.thread_id, userId },
       content: { is: null },
@@ -31,7 +31,7 @@ export class FeedService {
     }
     return this.prisma.feed.findMany({
       where,
-      take: query.limit,
+      take: limit,
       orderBy: { createdAt: 'desc' },
     });
   }

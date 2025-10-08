@@ -15,6 +15,33 @@ export class ContentService {
     private minio: MinioService,
   ) {}
 
+  async findMany(userId: string) {
+    const data = await this.prisma.content.findMany({
+      where: { platformAccount: { userId } },
+      include: {
+        contentFile: { select: { file: true } },
+        platformAccount: { select: { platform: true } },
+      },
+      take: 10,
+      orderBy: { updatedAt: 'desc' },
+    });
+    return await Promise.all(
+      data.map(async ({ contentFile, platformAccount, ...item }) => ({
+        ...item,
+        platform: platformAccount.platform,
+        files: await Promise.all(
+          contentFile.map(async (item) => ({
+            ...item.file,
+            url: await this.minio.presignedGetObject(
+              item.file.bucket,
+              item.file.path,
+            ),
+          })),
+        ),
+      })),
+    );
+  }
+
   async create(payload: CreateContentDto) {
     const feed = await this.prisma.feed.findUnique({
       where: { id: payload.feedId },
