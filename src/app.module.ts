@@ -27,7 +27,7 @@ import { ContentModule } from './content/content.module';
     PlatformAccountModule,
     ContentModule,
     MinioModule,
-    AuthModule.forRoot(auth),
+    AuthModule.forRoot({ auth }),
     MulterModule.register({ limits: { fileSize: 5 * 1024 * 1024 } }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({

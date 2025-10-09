@@ -20,7 +20,7 @@ export class FeedService {
     private minio: MinioService,
   ) {}
 
-  findMany(userId: string, { limit = 10, ...query }: GetFeedQueryDto) {
+  async findMany(userId: string, { limit = 10, ...query }: GetFeedQueryDto) {
     const where: Prisma.FeedWhereInput = {
       threadMember: { threadId: query.thread_id, userId },
       content: { is: null },
@@ -29,11 +29,18 @@ export class FeedService {
       const time = subDays(new Date(), parseInt(query.less_than));
       where.updatedAt = { gte: time };
     }
-    return this.prisma.feed.findMany({
+    const data = await this.prisma.feed.findMany({
       where,
       take: limit,
       orderBy: { createdAt: 'desc' },
+      include: {
+        threadMember: { select: { thread: { select: { name: true } } } },
+      },
     });
+    return data.map(({ threadMember, ...rest }) => ({
+      ...rest,
+      threadName: threadMember.thread.name,
+    }));
   }
 
   async download(feedId: string) {

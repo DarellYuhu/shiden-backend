@@ -76,8 +76,11 @@ export class ThreadService {
   }
 
   async addMembers(threadId: string, payload: AddMembersDto) {
+    const userCandidate = await this.prisma.user.findMany({
+      where: { username: { in: payload.map(({ username }) => username) } },
+    });
     return this.prisma.threadMember.createMany({
-      data: payload.map((item) => ({ userId: item.id, threadId })),
+      data: userCandidate.map((item) => ({ userId: item.id, threadId })),
       skipDuplicates: true,
     });
   }

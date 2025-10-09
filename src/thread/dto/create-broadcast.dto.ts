@@ -8,5 +8,5 @@ const CreateBroadcastSchema = z
     link: z.url().nonempty(),
     type: z.enum(BroadcastType),
   })
-  .required({ message: true });
+  .partial({ link: true, type: true });
 export class CreateBroadcastDto extends createZodDto(CreateBroadcastSchema) {}

@@ -4,8 +4,7 @@ export const AddMembersSchema = z
   .array(
     z
       .object({
-        id: z.string(),
-        name: z.string(),
+        username: z.string(),
       })
       .required(),
   )
