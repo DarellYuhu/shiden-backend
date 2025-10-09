@@ -9,18 +9,17 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN bunx prisma generate \
-  && bun run build 
+RUN bunx prisma generate
 
 FROM base AS runner
 WORKDIR /app
 COPY --from=builder /app/generated ./generated
-COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json /app/bun.lock ./
+COPY . .
 RUN bun install --production
 
 # Expose the application port
 EXPOSE 3000
 
 # Command to run the application
-CMD ["bun", "run", "dist/main"]
+CMD ["bun", "run", "src/main"]

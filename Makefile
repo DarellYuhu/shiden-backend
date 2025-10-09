@@ -10,6 +10,9 @@ db-generate:
 db-migrate:
 	dotenv -e .env.development -- bunx prisma migrate dev
 
+db-deploy:
+	bunx prisma migrate deploy
+
 compose-up:
 	docker compose up -d
 
