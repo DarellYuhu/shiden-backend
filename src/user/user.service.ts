@@ -19,6 +19,14 @@ export class UserService {
     return this.prisma.user.create({ data });
   }
 
+  async checkIsNewUser(userId: string) {
+    const data = await this.prisma.user.findUnique({
+      where: { id: userId, account: { none: {} } },
+    });
+    if (data) return true;
+    return false;
+  }
+
   async getBroadcast(userId: string) {
     const aDay = subDays(new Date(), 1);
     const data = await this.prisma.broadcast.findMany({

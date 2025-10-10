@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
-import { AccountModule } from './account/account.module';
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
@@ -20,7 +19,6 @@ import { ContentModule } from './content/content.module';
 @Module({
   imports: [
     PrismaModule,
-    AccountModule,
     FeedModule,
     UserModule,
     ThreadModule,

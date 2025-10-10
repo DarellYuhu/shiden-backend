@@ -20,4 +20,9 @@ export class UserController {
   getBroadcast(@Session() session: UserSession) {
     return this.userService.getBroadcast(session.user.id);
   }
+
+  @Get('is-new')
+  checkIsNewUser(@Session() session: UserSession) {
+    return this.userService.checkIsNewUser(session.user.id);
+  }
 }

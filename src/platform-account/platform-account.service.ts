@@ -7,8 +7,9 @@ export class PlatformAccountService {
   constructor(private prisma: PrismaService) {}
 
   create(userId: string, payload: CreatePlatformAccountDto) {
-    return this.prisma.platformAccount.create({
-      data: { ...payload, userId },
+    return this.prisma.platformAccount.createMany({
+      data: payload.data.map((acc) => ({ ...acc, userId })),
+      skipDuplicates: true,
     });
   }
 
