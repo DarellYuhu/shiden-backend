@@ -8,6 +8,10 @@ import { ZodValidationPipe } from 'nestjs-zod';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bodyParser: false,
+    httpsOptions: {
+      key: process.env.HTTPS_KEY,
+      cert: process.env.HTTPS_CERT,
+    },
   });
 
   app.enableCors({
