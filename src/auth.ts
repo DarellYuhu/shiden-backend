@@ -16,4 +16,10 @@ export const auth = betterAuth({
   plugins: [username(), openAPI(), admin()],
   hooks: {},
   trustedOrigins: process.env.ALLOWED_ORIGINS?.split(','),
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: process.env.DOMAIN,
+    },
+  },
 });
