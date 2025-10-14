@@ -112,7 +112,7 @@ model Feed {
 
 model Content {
   id          String    @id @default(uuid())
-  link        String
+  link        String?
   createTime  DateTime?
   description String?
   createdAt   DateTime  @default(now())

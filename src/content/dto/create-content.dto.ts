@@ -7,6 +7,6 @@ const CreateContentSchema = z
     feedId: z.string().nonempty(),
     platformAccountId: z.string().nonempty(),
   })
-  .required();
+  .partial({ link: true });
 
 export class CreateContentDto extends createZodDto(CreateContentSchema) {}

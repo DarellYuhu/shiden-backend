@@ -10,11 +10,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AuthHook } from './core/auth/auth.hook';
 import { UserService } from './user/user.service';
 import { ThreadModule } from './thread/thread.module';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { MinioModule } from './core/minio/minio.module';
 import { PlatformAccountModule } from './platform-account/platform-account.module';
 import { ContentModule } from './content/content.module';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ContentModule } from './content/content.module';
   providers: [
     AuthHook,
     UserService,
+    { provide: APP_PIPE, useClass: ZodValidationPipe },
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })

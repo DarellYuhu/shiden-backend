@@ -6,6 +6,7 @@ import { lastValueFrom } from 'rxjs';
 import { Content } from 'types';
 import { MinioService } from 'src/core/minio/minio.service';
 import { fileTypeFromBuffer } from 'file-type';
+import { UpdateContentDto } from './dto/update-content.dto';
 
 @Injectable()
 export class ContentService {
@@ -40,6 +41,10 @@ export class ContentService {
         ),
       })),
     );
+  }
+
+  async findUnique(id: string) {
+    return this.prisma.content.findUnique({ where: { id } });
   }
 
   async create(payload: CreateContentDto) {
@@ -81,6 +86,10 @@ export class ContentService {
         },
       },
     });
+  }
+
+  async update(id: string, payload: UpdateContentDto) {
+    return this.prisma.content.update({ where: { id }, data: payload });
   }
 
   private async getImageBuffer(link: string) {

@@ -25,22 +25,41 @@ export class FeedService {
       threadMember: { threadId: query.thread_id, userId },
       content: { is: null },
     };
+    let cursor: Prisma.FeedWhereUniqueInput | undefined = undefined;
     if (query.less_than) {
       const time = subDays(new Date(), parseInt(query.less_than));
       where.updatedAt = { gte: time };
     }
+    if (query.cursor) {
+      cursor = {
+        id: query.cursor.id,
+        createdAt: query.cursor.created_at,
+      } satisfies Prisma.FeedWhereUniqueInput;
+    }
     const data = await this.prisma.feed.findMany({
       where,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      skip: cursor ? 1 : 0,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       include: {
         threadMember: { select: { thread: { select: { name: true } } } },
       },
+      cursor,
     });
-    return data.map(({ threadMember, ...rest }) => ({
-      ...rest,
-      threadName: threadMember.thread.name,
-    }));
+    const lastData = data.at(data.length - 1);
+    return {
+      data: data.map(({ threadMember, ...rest }) => ({
+        ...rest,
+        threadName: threadMember.thread.name,
+      })),
+      cursor: lastData
+        ? { createdAt: lastData.createdAt, id: lastData.id }
+        : null,
+    };
+  }
+
+  async findUnique(id: string) {
+    return this.prisma.feed.findUnique({ where: { id } });
   }
 
   async download(feedId: string) {

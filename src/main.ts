@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { ZodValidationPipe } from 'nestjs-zod';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -14,11 +13,11 @@ async function bootstrap() {
     },
   });
 
+  app.set('query parser', 'extended');
   app.enableCors({
     origin: process.env.ALLOWED_ORIGINS?.split(','),
     credentials: true,
   });
-  app.useGlobalPipes(new ZodValidationPipe());
 
   // api docs
   const config = new DocumentBuilder().setTitle('Shiden API').build();

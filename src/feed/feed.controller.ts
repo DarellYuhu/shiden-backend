@@ -16,6 +16,11 @@ export class FeedController {
     return this.feedService.findMany(session.user.id, query);
   }
 
+  @Get(':id')
+  findUnique(@Param('id') id: string) {
+    return this.feedService.findUnique(id);
+  }
+
   @Post('trigger-scheduler')
   getFeeds() {
     this.feedScheduler.getFeeds();

@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ContentService } from './content.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import { UpdateContentDto } from './dto/update-content.dto';
 
 @Controller('contents')
 export class ContentController {
@@ -15,5 +16,10 @@ export class ContentController {
   @Get()
   findMany(@Session() session: UserSession) {
     return this.contentService.findMany(session.user.id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() payload: UpdateContentDto) {
+    return this.contentService.update(id, payload);
   }
 }
