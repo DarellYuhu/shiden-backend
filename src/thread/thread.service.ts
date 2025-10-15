@@ -59,7 +59,7 @@ export class ThreadService {
         where: { id: threadId },
         include: {
           threadMember: {
-            include: { user: { select: { name: true } } },
+            include: { user: { select: { name: true, username: true } } },
           },
         },
       })
@@ -70,7 +70,7 @@ export class ThreadService {
       ...rest,
       members: threadMember.map(({ user, ...rest }) => ({
         ...rest,
-        name: user.name,
+        ...user,
       })),
     };
   }

@@ -58,13 +58,20 @@ export class FeedScheduler {
       thread.flatMap((t) => t.threadMember.map((tm) => tm.id)),
     );
     if (uids.length === 0) return;
-    const feedPayload: Prisma.FeedCreateManyInput[] = contents.map(
-      (ct, idx) => ({
-        id: ct.id,
-        threadMemberId: uids[idx % uids.length],
-        contentMeta: ct,
-      }),
-    );
+    const feedPayload: Prisma.FeedCreateManyInput[] = uids
+      .slice(0, contents.length)
+      .map((threadMemberId, idx) => ({
+        id: contents[idx].id,
+        threadMemberId,
+        contentMeta: contents[idx],
+      }));
+    // const feedPayload: Prisma.FeedCreateManyInput[] = contents.map(
+    //   (ct, idx) => ({
+    //     id: ct.id,
+    //     threadMemberId: uids[idx % uids.length],
+    //     contentMeta: ct,
+    //   }),
+    // );
     await this.prisma.feed.createMany({
       data: feedPayload,
       skipDuplicates: true,
