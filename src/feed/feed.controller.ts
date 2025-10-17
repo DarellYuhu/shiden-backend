@@ -1,10 +1,15 @@
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { FeedService } from './feed.service';
-import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import {
+  AuthGuard,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
 import { FeedScheduler } from './feed.scheduler';
 import { GetFeedQueryDto } from './dto/get-feed-query.dto';
 
 @Controller('feeds')
+@UseGuards(AuthGuard)
 export class FeedController {
   constructor(
     private readonly feedService: FeedService,

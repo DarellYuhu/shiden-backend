@@ -54,16 +54,29 @@ export class FeedScheduler {
         threadMember: { select: { id: true }, where: { isEnabled: true } },
       },
     });
+    const existingContents = await this.prisma.feed.findMany({
+      where: {
+        id: {
+          in: contents.map(({ id }) => id),
+        },
+        createdAt: { gte: subHours(new Date(), 60) },
+      },
+      select: { id: true },
+    });
+    const existingIds = new Set(existingContents.map((i) => i.id));
+    console.log(existingIds);
+    const newContents = contents.filter(({ id }) => !existingIds.has(id));
+    console.log(newContents[0].id);
     const uids = shuffle(
       thread.flatMap((t) => t.threadMember.map((tm) => tm.id)),
     );
     if (uids.length === 0) return;
     const feedPayload: Prisma.FeedCreateManyInput[] = uids
-      .slice(0, contents.length)
+      .slice(0, newContents.length)
       .map((threadMemberId, idx) => ({
-        id: contents[idx].id,
+        id: newContents[idx].id,
         threadMemberId,
-        contentMeta: contents[idx],
+        contentMeta: newContents[idx],
       }));
     // const feedPayload: Prisma.FeedCreateManyInput[] = contents.map(
     //   (ct, idx) => ({
@@ -84,7 +97,7 @@ export class FeedScheduler {
     return contents.reduce((map, content) => {
       if (!allowedId.has(content.workgroupId)) return map;
       if (!map.has(content.workgroupId)) map.set(content.workgroupId, []);
-      map.get(content.workgroupId)!.push(content);
+      map.get(content.workgroupId)?.push(content);
       return map;
     }, new Map<string, Content[]>());
   }

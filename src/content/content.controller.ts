@@ -1,10 +1,23 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ContentService } from './content.service';
 import { CreateContentDto } from './dto/create-content.dto';
-import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import {
+  AuthGuard,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
 import { UpdateContentDto } from './dto/update-content.dto';
 
 @Controller('contents')
+@UseGuards(AuthGuard)
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
 

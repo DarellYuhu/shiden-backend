@@ -1,9 +1,14 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { PlatformAccountService } from './platform-account.service';
 import { CreatePlatformAccountDto } from './dto/create-platform-account.dto';
-import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import {
+  AuthGuard,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
 
 @Controller('platform-accounts')
+@UseGuards(AuthGuard)
 export class PlatformAccountController {
   constructor(
     private readonly platformAccountService: PlatformAccountService,

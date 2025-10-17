@@ -7,17 +7,23 @@ import {
   ParseFilePipeBuilder,
   Post,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ThreadService } from './thread.service';
 import { CreateThreadDto } from './dto/create-thread.dto';
-import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import {
+  AuthGuard,
+  Session,
+  type UserSession,
+} from '@thallesp/nestjs-better-auth';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { parse } from 'csv-parse/sync';
 import { AddMembersSchema } from './dto/add-members-dto';
 import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 
 @Controller('threads')
+@UseGuards(AuthGuard)
 export class ThreadController {
   constructor(private readonly threadService: ThreadService) {}
 
