@@ -5,6 +5,7 @@ import { subHours } from 'date-fns';
 import { Prisma } from 'generated/prisma';
 import { shuffle } from 'lodash';
 import { lastValueFrom } from 'rxjs';
+import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Content } from 'types';
 
@@ -17,6 +18,7 @@ export class FeedScheduler {
     private scheduler: SchedulerRegistry,
     private prisma: PrismaService,
     private http: HttpService,
+    private notification: NotificationService,
   ) {}
 
   @Cron(CronExpression.EVERY_HOUR, {
@@ -64,9 +66,7 @@ export class FeedScheduler {
       select: { id: true },
     });
     const existingIds = new Set(existingContents.map((i) => i.id));
-    console.log(existingIds);
     const newContents = contents.filter(({ id }) => !existingIds.has(id));
-    console.log(newContents[0].id);
     const uids = shuffle(
       thread.flatMap((t) => t.threadMember.map((tm) => tm.id)),
     );
@@ -78,17 +78,18 @@ export class FeedScheduler {
         threadMemberId,
         contentMeta: newContents[idx],
       }));
-    // const feedPayload: Prisma.FeedCreateManyInput[] = contents.map(
-    //   (ct, idx) => ({
-    //     id: ct.id,
-    //     threadMemberId: uids[idx % uids.length],
-    //     contentMeta: ct,
-    //   }),
-    // );
-    await this.prisma.feed.createMany({
+    const result = await this.prisma.feed.createManyAndReturn({
       data: feedPayload,
+      include: { threadMember: { select: { userId: true } } },
       skipDuplicates: true,
     });
+    const userIds = new Set(result.map((item) => item.threadMember.userId));
+    await Promise.all(
+      Array.from(userIds).map(
+        async (uid) =>
+          await this.notification.newFeedsAdded().trigger({ to: uid }),
+      ),
+    );
   }
 
   private async groupBySource(contents: Content[]) {

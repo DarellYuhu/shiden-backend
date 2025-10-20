@@ -4,6 +4,9 @@ auth-generate:
 auth-migrate:
 	bunx @better-auth/cli@latest migrate
 
+novu-start:
+	bunx novu@latest dev -p 3000 -d https://nv.binili.net
+
 db-generate:
 	bunx prisma generate
 

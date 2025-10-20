@@ -9,6 +9,7 @@
     "build": "bun build src/main -e @nestjs/microservices -e class-validator -e class-transformer -e @nestjs/core -e ts-morph --target bun --outdir dist",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
+    "start:novu": "bunx novu@latest dev -p 3000 -d https://nv.binili.net",
     "start:dev": "bun --watch run src/main",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -46,6 +47,7 @@
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "web-push": "^3.6.7",
     "zod": "^4.1.12",
     "zod-to-json-schema": "^3.24.6"
   },
@@ -67,6 +69,7 @@
     "@types/papaparse": "^5.3.16",
     "@types/pg": "^8.15.5",
     "@types/supertest": "^6.0.3",
+    "@types/web-push": "^3.6.4",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
