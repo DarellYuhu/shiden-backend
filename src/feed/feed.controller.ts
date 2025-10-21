@@ -1,6 +1,7 @@
 import { Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import {
+  AllowAnonymous,
   AuthGuard,
   Session,
   type UserSession,
@@ -26,6 +27,7 @@ export class FeedController {
     return this.feedService.findUnique(id);
   }
 
+  @AllowAnonymous()
   @Post('trigger-scheduler')
   getFeeds() {
     this.feedScheduler.getFeeds();

@@ -83,11 +83,15 @@ export class FeedScheduler {
       include: { threadMember: { select: { userId: true } } },
       skipDuplicates: true,
     });
-    const userIds = new Set(result.map((item) => item.threadMember.userId));
+    const contentCounts = result.reduce((acc, curr) => {
+      const uid = curr.threadMember.userId;
+      acc.set(uid, (acc.get(uid) || 0) + 1);
+      return acc;
+    }, new Map<string, number>());
     await Promise.all(
-      Array.from(userIds).map(
-        async (uid) =>
-          await this.notification.newFeedsAdded().trigger({ to: uid }),
+      Array.from(contentCounts).map(
+        async ([k, v]) =>
+          await this.notification.newFeedsAdded(k, { count: v }),
       ),
     );
   }

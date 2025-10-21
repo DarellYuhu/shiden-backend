@@ -3,7 +3,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { AllowAnonymous, AuthModule } from '@thallesp/nestjs-better-auth';
+import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './auth';
 import { FeedModule } from './feed/feed.module';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -17,8 +17,6 @@ import { PlatformAccountModule } from './platform-account/platform-account.modul
 import { ContentModule } from './content/content.module';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { NotificationModule } from './notification/notification.module';
-import { NovuModule } from '@novu/framework/nest';
-import { NotificationService } from './notification/notification.service';
 
 @Module({
   imports: [
@@ -36,15 +34,15 @@ import { NotificationService } from './notification/notification.service';
       envFilePath: ['.env.development'],
       expandVariables: true,
     }),
-    NovuModule.registerAsync({
-      imports: [NotificationModule],
-      inject: [NotificationService],
-      useFactory: (notificationService: NotificationService) => ({
-        apiPath: '/api/novu',
-        workflows: [notificationService.newFeedsAdded()],
-        controllerDecorators: [AllowAnonymous()],
-      }),
-    }),
+    // NovuModule.registerAsync({
+    //   imports: [NotificationModule],
+    //   inject: [NotificationService],
+    //   useFactory: (notificationService: NotificationService) => ({
+    //     apiPath: '/api/novu',
+    //     workflows: [notificationService.newFeedsAdded()],
+    //     controllerDecorators: [AllowAnonymous()],
+    //   }),
+    // }),
     AuthModule.forRoot({
       auth,
       disableTrustedOriginsCors: true,

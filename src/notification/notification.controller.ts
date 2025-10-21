@@ -1,10 +1,9 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { NotificationService } from './notification.service';
-import { AuthGuard } from '@thallesp/nestjs-better-auth';
 import { CreatePushSubscriptionDto } from './dto/create-push-subscription.dto';
+import { type NovuPushPayload } from 'types';
 
 @Controller('notifications')
-@UseGuards(AuthGuard)
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
@@ -13,17 +12,23 @@ export class NotificationController {
     return this.notificationService.subscribeUser(payload);
   }
 
-  @Post('trigger-new-feeds')
+  @Post('test/new-feeds')
   async trigger() {
-    const huhi = await this.notificationService.newFeedsAdded().trigger({
-      to: { subscriberId: '68ef55fd712c63b6bfb0d197' },
-    });
-    return huhi.data;
+    if (process.env.NODE_ENV !== 'development')
+      return { message: 'this only works on development' };
+    const huhi = await this.notificationService.newFeedsAdded(
+      'YEgTskK9pzGEow6mvsDHGHLHPzgTDkSE',
+      { count: 10 },
+    );
+    return huhi.result;
   }
 
   @Post('webhook')
-  webhook(@Body() payload: string) {
-    console.log(payload);
-    return { message: 'webhook sent' };
+  async webhook(@Body() payload: NovuPushPayload) {
+    await this.notificationService.sendPushNotification(
+      { title: payload.title, body: payload.content },
+      payload.payload.subscriber.subscriberId,
+    );
+    return { message: 'notification send successfully!' };
   }
 }
