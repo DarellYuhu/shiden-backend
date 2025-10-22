@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "ThreadMember" ADD COLUMN     "lastUpdate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

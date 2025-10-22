@@ -3,7 +3,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { subHours } from 'date-fns';
 import { Prisma } from 'generated/prisma';
-import { shuffle } from 'lodash';
 import { lastValueFrom } from 'rxjs';
 import { NotificationService } from 'src/notification/notification.service';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -39,8 +38,6 @@ export class FeedScheduler {
     waitForCompletion: true,
   })
   async getFeeds() {
-    // if (this.NODE_ENV === 'development')
-    //   this.scheduler.deleteCronJob('fetch-feeds-scheduler');
     const { data } = await lastValueFrom(this.http.get<Content[]>('/contents'));
     const groupedContent = await this.groupBySource(data);
     for (const [k, v] of groupedContent) {
@@ -53,7 +50,11 @@ export class FeedScheduler {
     const thread = await this.prisma.thread.findMany({
       where: { source: { some: { workgroupId } } },
       include: {
-        threadMember: { select: { id: true }, where: { isEnabled: true } },
+        threadMember: {
+          select: { id: true },
+          where: { isEnabled: true },
+          orderBy: { lastUpdate: 'asc' },
+        },
       },
     });
     const existingContents = await this.prisma.feed.findMany({
@@ -67,21 +68,25 @@ export class FeedScheduler {
     });
     const existingIds = new Set(existingContents.map((i) => i.id));
     const newContents = contents.filter(({ id }) => !existingIds.has(id));
-    const uids = shuffle(
-      thread.flatMap((t) => t.threadMember.map((tm) => tm.id)),
-    );
-    if (uids.length === 0) return;
-    const feedPayload: Prisma.FeedCreateManyInput[] = uids
-      .slice(0, newContents.length)
-      .map((threadMemberId, idx) => ({
+    const tmids = thread
+      .flatMap((t) => t.threadMember.map((tm) => tm.id))
+      .slice(0, newContents.length);
+    if (tmids.length === 0) return;
+    const feedPayload: Prisma.FeedCreateManyInput[] = tmids.map(
+      (threadMemberId, idx) => ({
         id: newContents[idx].id,
         threadMemberId,
         contentMeta: newContents[idx],
-      }));
+      }),
+    );
     const result = await this.prisma.feed.createManyAndReturn({
       data: feedPayload,
       include: { threadMember: { select: { userId: true } } },
       skipDuplicates: true,
+    });
+    await this.prisma.threadMember.updateMany({
+      where: { id: { in: tmids } },
+      data: { lastUpdate: new Date() },
     });
     const contentCounts = result.reduce((acc, curr) => {
       const uid = curr.threadMember.userId;

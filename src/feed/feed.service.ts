@@ -9,6 +9,8 @@ import { Content } from 'types';
 import { GetFeedQueryDto } from './dto/get-feed-query.dto';
 import { Prisma } from 'generated/prisma';
 import { subDays } from 'date-fns';
+import { fileTypeFromStream } from 'file-type';
+import got from 'got';
 
 @Injectable()
 export class FeedService {
@@ -48,10 +50,25 @@ export class FeedService {
     });
     const lastData = data.at(data.length - 1);
     return {
-      data: data.map(({ threadMember, ...rest }) => ({
-        ...rest,
-        threadName: threadMember.thread.name,
-      })),
+      data: await Promise.all(
+        data.map(async ({ threadMember, ...rest }) => {
+          const contentMeta = rest.contentMeta as Content;
+          const files = await Promise.all(
+            contentMeta.files.map(async (file) => {
+              const stream = got.stream(file.url);
+              return {
+                ...file,
+                mimeType: (await fileTypeFromStream(stream))?.mime,
+              };
+            }),
+          );
+          return {
+            ...rest,
+            contentMeta: { ...contentMeta, files },
+            threadName: threadMember.thread.name,
+          };
+        }),
+      ),
       cursor: lastData
         ? { createdAt: lastData.createdAt, id: lastData.id }
         : null,

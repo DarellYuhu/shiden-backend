@@ -85,11 +85,12 @@ model Broadcast {
 }
 
 model ThreadMember {
-  id        String     @id @default(uuid())
-  userId    String
-  threadId  String
-  role      ThreadRole @default(USER)
-  isEnabled Boolean    @default(true)
+  id         String     @id @default(uuid())
+  userId     String
+  threadId   String
+  role       ThreadRole @default(USER)
+  isEnabled  Boolean    @default(true)
+  lastUpdate DateTime   @default(now())
 
   user   User   @relation(fields: [userId], references: [id])
   thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
