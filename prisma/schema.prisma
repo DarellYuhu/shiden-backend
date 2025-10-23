@@ -137,7 +137,7 @@ model Content {
 
   statistic       Statistic?
   cover           File?           @relation(fields: [coverId], references: [id])
-  feed            Feed            @relation(fields: [feedId], references: [id])
+  feed            Feed            @relation(fields: [feedId], references: [id], onDelete: Cascade)
   platformAccount PlatformAccount @relation(fields: [platformAccountId], references: [id])
   contentFile     ContentFile[]
 }
@@ -146,7 +146,7 @@ model ContentFile {
   contentId String
   fileId    Int    @unique
 
-  content Content @relation(fields: [contentId], references: [id])
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
   file    File    @relation(fields: [fileId], references: [id])
 
   @@unique([contentId, fileId])

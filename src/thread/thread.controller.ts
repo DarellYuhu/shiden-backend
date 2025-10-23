@@ -2,10 +2,12 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseFilePipeBuilder,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -21,6 +23,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { parse } from 'csv-parse/sync';
 import { AddMembersSchema } from './dto/add-members-dto';
 import { CreateBroadcastDto } from './dto/create-broadcast.dto';
+import { GetMembersQueryDto } from './dto/get-members-query.dto';
+import { DeleteMembersDto } from './dto/delete-members.dto';
 
 @Controller('threads')
 @UseGuards(AuthGuard)
@@ -37,14 +41,19 @@ export class ThreadController {
     return this.threadService.findMany(session.user.id);
   }
 
+  @Delete('/members')
+  deleteThreadMembers(@Query() query: DeleteMembersDto) {
+    return this.threadService.deleteThreadMembers(query);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.threadService.findOne(id);
   }
 
   @Get(':id/members')
-  threadMembers(@Param('id') id: string) {
-    return this.threadService.threadMembers(id);
+  threadMembers(@Param('id') id: string, @Query() query: GetMembersQueryDto) {
+    return this.threadService.threadMembers(id, query);
   }
 
   @Post(':id/members')

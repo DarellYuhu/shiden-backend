@@ -5,6 +5,8 @@ import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { AddMembersDto } from './dto/add-members-dto';
 import { CreateBroadcastDto } from './dto/create-broadcast.dto';
+import { GetMembersQueryDto } from './dto/get-members-query.dto';
+import { DeleteMembersDto } from './dto/delete-members.dto';
 
 @Injectable()
 export class ThreadService {
@@ -44,7 +46,12 @@ export class ThreadService {
   }
 
   async findOne(id: string) {
-    return this.prisma.thread.findUniqueOrThrow({ where: { id } });
+    const { threadMember, ...data } =
+      await this.prisma.thread.findUniqueOrThrow({
+        where: { id },
+        include: { threadMember: { where: { role: 'OWNER' } } },
+      });
+    return { ...data, ownerId: threadMember.at(0)?.userId };
   }
 
   async findMany(userId: string) {
@@ -53,13 +60,16 @@ export class ThreadService {
     });
   }
 
-  async threadMembers(threadId: string) {
+  async threadMembers(threadId: string, query: GetMembersQueryDto) {
     const { threadMember, ...rest } = await this.prisma.thread
       .findUniqueOrThrow({
         where: { id: threadId },
         include: {
           threadMember: {
             include: { user: { select: { name: true, username: true } } },
+            where: {
+              user: { name: { contains: query.search, mode: 'insensitive' } },
+            },
           },
         },
       })
@@ -82,6 +92,12 @@ export class ThreadService {
     return this.prisma.threadMember.createMany({
       data: userCandidate.map((item) => ({ userId: item.id, threadId })),
       skipDuplicates: true,
+    });
+  }
+
+  deleteThreadMembers(query: DeleteMembersDto) {
+    return this.prisma.threadMember.deleteMany({
+      where: { id: { in: query.userIds } },
     });
   }
 
