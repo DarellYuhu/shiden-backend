@@ -58,7 +58,15 @@ export class FeedService {
               const stream = got.stream(file.url);
               return {
                 ...file,
-                mimeType: (await fileTypeFromStream(stream))?.mime,
+                mimeType: (
+                  await fileTypeFromStream(stream).catch(
+                    (err: got.GotError) => {
+                      this.logger.warn(
+                        `${err.name}: Fail get mime type from source`,
+                      );
+                    },
+                  )
+                )?.mime,
               };
             }),
           );

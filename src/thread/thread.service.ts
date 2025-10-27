@@ -68,7 +68,14 @@ export class ThreadService {
           threadMember: {
             include: { user: { select: { name: true, username: true } } },
             where: {
-              user: { name: { contains: query.search, mode: 'insensitive' } },
+              user: {
+                OR: [
+                  {
+                    name: { contains: query.search, mode: 'insensitive' },
+                    username: { contains: query.search, mode: 'insensitive' },
+                  },
+                ],
+              },
             },
           },
         },

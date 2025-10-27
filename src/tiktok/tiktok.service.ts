@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
+import { TiktokResponse } from 'types';
 // import { UtilsService } from 'src/core/utils/utils.service';
 
 @Injectable()
@@ -81,44 +82,3 @@ export class TiktokService {
     return normalize;
   }
 }
-
-type TiktokResponse = {
-  aweme_list: {
-    aweme_id: string;
-    desc: string;
-    create_time: number;
-    author: {
-      uid: string;
-      nickname: string;
-      signature: string;
-      avatar_larger: {
-        uri: string;
-        url_list: string[];
-        width: number;
-        height: number;
-      };
-    };
-    video: {
-      cover: {
-        uri: string;
-        url_list: string[];
-        width: number;
-        height: number;
-      };
-      duration: number;
-    };
-    statistics: {
-      comment_count: number;
-      digg_count: number;
-      download_count: number;
-      play_count: number;
-      share_count: number;
-      forward_count: number;
-      lose_count: number;
-      lose_comment_count: number;
-      whatsapp_share_count: number;
-      collect_count: number;
-      repost_count: number;
-    };
-  }[];
-};
