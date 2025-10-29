@@ -17,6 +17,7 @@ import { PlatformAccountModule } from './platform-account/platform-account.modul
 import { ContentModule } from './content/content.module';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { NotificationModule } from './notification/notification.module';
+import { BroadcastModule } from './broadcast/broadcast.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationModule } from './notification/notification.module';
     ContentModule,
     MinioModule,
     NotificationModule,
+    BroadcastModule,
     MulterModule.register({ limits: { fileSize: 5 * 1024 * 1024 } }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({

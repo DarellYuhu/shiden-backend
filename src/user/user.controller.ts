@@ -21,6 +21,11 @@ export class UserController {
     return this.userService.statistics(session.user.id);
   }
 
+  @Get('statistics/sign-up-users')
+  signUpUsersStatistic() {
+    return this.userService.signUpUsersStatistic();
+  }
+
   @Get('broadcast')
   getBroadcast(@Session() session: UserSession) {
     return this.userService.getBroadcast(session.user.id);

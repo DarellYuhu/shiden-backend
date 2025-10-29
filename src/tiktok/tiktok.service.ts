@@ -11,7 +11,7 @@ export class TiktokService {
     // private readonly utils: UtilsService,
   ) {}
 
-  async getVideoInfo({ id, url }: { id: string; url: string }) {
+  async getVideoInfo(id: string) {
     const params = {
       aweme_id: id,
       iid: '7318518857994389254',
@@ -41,44 +41,33 @@ export class TiktokService {
         headers,
       }),
     );
-
-    // const images = await Promise.all([
-    //   this.utils.fetchImageMeta(
-    //     data.aweme_list[0].author.avatar_larger.url_list[0],
-    //   ),
-    //   this.utils.fetchImageMeta(data.aweme_list[0].video.cover.url_list[0]),
-    // ]);
-
-    const normalize = {
-      url,
-      images: {
-        // avatar: images[0],
-        // video: images[1],
-        fileId: 'will_be_replaced',
-      },
-      author: {
-        uid: data.aweme_list[0].author.uid,
-        nickname: data.aweme_list[0].author.nickname,
-        signature: data.aweme_list[0].author.signature,
-      },
-      video: {
-        id,
-        description: data.aweme_list[0].desc,
-        createTime: data.aweme_list[0].create_time,
-        duration: data.aweme_list[0].video.duration,
-        comment: data.aweme_list[0].statistics.comment_count,
-        like: data.aweme_list[0].statistics.digg_count,
-        download: data.aweme_list[0].statistics.download_count,
-        play: data.aweme_list[0].statistics.play_count,
-        share: data.aweme_list[0].statistics.share_count,
-        forward: data.aweme_list[0].statistics.forward_count,
-        lose: data.aweme_list[0].statistics.lose_count,
-        lose_comment: data.aweme_list[0].statistics.lose_comment_count,
-        whatsapp_share: data.aweme_list[0].statistics.whatsapp_share_count,
-        collect: data.aweme_list[0].statistics.collect_count,
-        repost: data.aweme_list[0].statistics.repost_count,
-      },
-    };
-    return normalize;
+    const content = data.aweme_list.find((item) => item.aweme_id === id);
+    if (content) {
+      const normalize = {
+        author: {
+          uid: content.author.uid,
+          nickname: content.author.nickname,
+          signature: content.author.signature,
+        },
+        video: {
+          id,
+          description: content.desc,
+          createTime: content.create_time,
+          duration: content.video.duration,
+          comment: content.statistics.comment_count,
+          like: content.statistics.digg_count,
+          download: content.statistics.download_count,
+          play: content.statistics.play_count,
+          share: content.statistics.share_count,
+          forward: content.statistics.forward_count,
+          lose: content.statistics.lose_count,
+          lose_comment: content.statistics.lose_comment_count,
+          whatsapp_share: content.statistics.whatsapp_share_count,
+          collect: content.statistics.collect_count,
+          repost: content.statistics.repost_count,
+        },
+      };
+      return normalize;
+    } else return null;
   }
 }

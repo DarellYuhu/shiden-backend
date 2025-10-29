@@ -43,9 +43,31 @@ export class ContentService {
     );
   }
 
+  async findManyConfirmed(userId: string) {
+    const data = await this.prisma.content.findMany({
+      where: { platformAccount: { userId }, link: { not: null } },
+      include: {
+        platformAccount: { select: { platform: true } },
+        feed: {
+          select: {
+            threadMember: { select: { thread: { select: { name: true } } } },
+          },
+        },
+      },
+    });
+    const normalized = data.map(({ platformAccount, feed, ...item }) => ({
+      ...item,
+      platform: platformAccount.platform,
+      thread: feed.threadMember.thread.name,
+    }));
+    return normalized;
+  }
+
   async findUnique(id: string) {
     return this.prisma.content.findUnique({ where: { id } });
   }
+
+  async createManual() {}
 
   async create(payload: CreateContentDto) {
     const feed = await this.prisma.feed.findUnique({
@@ -90,6 +112,10 @@ export class ContentService {
 
   async update(id: string, payload: UpdateContentDto) {
     return this.prisma.content.update({ where: { id }, data: payload });
+  }
+
+  async getVideoMetric(url: string) {
+    await lastValueFrom(this.http.get(url));
   }
 
   private async getImageBuffer(link: string) {

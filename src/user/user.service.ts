@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { subDays } from 'date-fns';
-import { Prisma } from 'generated/prisma';
+import { format, subDays } from 'date-fns';
+import { Prisma, User } from 'generated/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -43,6 +43,16 @@ export class UserService {
     }));
   }
 
+  async signUpUsersStatistic() {
+    const data = await this.prisma.user.findMany();
+    data.reduce((acc, curr) => {
+      const key = format(curr.createdAt, 'yyyy-MM-dd');
+      if (acc.has(key)) acc.get(key)?.push(curr);
+      else acc.set(key, [curr]);
+      return acc;
+    }, new Map<string, User[]>());
+  }
+
   async statistics(userId: string) {
     const accounts = this.prisma.platformAccount.aggregate({
       where: { userId },
@@ -60,12 +70,17 @@ export class UserService {
       where: { platformAccount: { userId } },
       _count: true,
     });
+    const confirmedPost = this.prisma.content.aggregate({
+      where: { platformAccount: { userId }, link: { not: null } },
+      _count: true,
+    });
     const broadcast = this.getBroadcast(userId);
     const data = await Promise.all([
       accounts,
       threads,
       feeds,
       posts,
+      confirmedPost,
       broadcast,
     ]);
     const normalized = {
@@ -73,7 +88,8 @@ export class UserService {
       threads: data[1]._count,
       feeds: data[2]._count,
       posts: data[3]._count,
-      broadcasts: data[4].length,
+      confirmedPost: data[4]._count,
+      broadcasts: data[5].length,
     };
     return normalized;
   }

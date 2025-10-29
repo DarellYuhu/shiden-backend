@@ -21,10 +21,11 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  account          PlatformAccount[]
-  threadMember     ThreadMember[]
-  broadcast        Broadcast[]
-  pushSubscription PushSubscription[]
+  account              PlatformAccount[]
+  threadMember         ThreadMember[]
+  broadcast            Broadcast[]
+  pushSubscription     PushSubscription[]
+  broadcastInteraction BroadcastInteraction[]
 }
 
 model PushSubscription {
@@ -80,8 +81,19 @@ model Broadcast {
   ownerId  String
   threadId String
 
-  thread Thread @relation(fields: [threadId], references: [id])
-  onwer  User   @relation(fields: [ownerId], references: [id])
+  thread               Thread                 @relation(fields: [threadId], references: [id])
+  onwer                User                   @relation(fields: [ownerId], references: [id])
+  broadcastInteraction BroadcastInteraction[]
+}
+
+model BroadcastInteraction {
+  broadcastId Int
+  userId      String
+
+  broadcast Broadcast @relation(fields: [broadcastId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([broadcastId, userId])
 }
 
 model ThreadMember {

@@ -31,6 +31,11 @@ export class ContentController {
     return this.contentService.findMany(session.user.id);
   }
 
+  @Get('confirmed')
+  findManyConfirmed(@Session() session: UserSession) {
+    return this.contentService.findManyConfirmed(session.user.id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() payload: UpdateContentDto) {
     return this.contentService.update(id, payload);
