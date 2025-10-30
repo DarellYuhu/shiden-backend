@@ -35,6 +35,7 @@ import { BroadcastModule } from './broadcast/broadcast.module';
     ConfigModule.forRoot({
       envFilePath: ['.env.development'],
       expandVariables: true,
+      ignoreEnvFile: true,
     }),
     // NovuModule.registerAsync({
     //   imports: [NotificationModule],

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateContentDto } from './dto/create-content.dto';
 import { HttpService } from '@nestjs/axios';
@@ -7,6 +11,7 @@ import { Content } from 'types';
 import { MinioService } from 'src/core/minio/minio.service';
 import { fileTypeFromBuffer } from 'file-type';
 import { UpdateContentDto } from './dto/update-content.dto';
+import { linkValidator } from 'src/utils';
 
 @Injectable()
 export class ContentService {
@@ -18,7 +23,7 @@ export class ContentService {
 
   async findMany(userId: string) {
     const data = await this.prisma.content.findMany({
-      where: { platformAccount: { userId } },
+      where: { platformAccount: { userId }, link: null },
       include: {
         contentFile: { select: { file: true } },
         platformAccount: { select: { platform: true } },
@@ -54,6 +59,7 @@ export class ContentService {
           },
         },
       },
+      orderBy: { updatedAt: 'desc' },
     });
     const normalized = data.map(({ platformAccount, feed, ...item }) => ({
       ...item,
@@ -111,6 +117,18 @@ export class ContentService {
   }
 
   async update(id: string, payload: UpdateContentDto) {
+    const content = await this.prisma.content.findUniqueOrThrow({
+      where: { id },
+      include: { platformAccount: { select: { platform: true } } },
+    });
+
+    if (payload.link) {
+      const isValid = linkValidator(
+        payload.link,
+        content.platformAccount.platform,
+      );
+      if (!isValid) throw new BadRequestException('Link is not valid');
+    }
     return this.prisma.content.update({ where: { id }, data: payload });
   }
 

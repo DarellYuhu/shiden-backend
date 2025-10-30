@@ -6,7 +6,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "bun build src/main -e @nestjs/microservices -e class-validator -e class-transformer -e @nestjs/core -e ts-morph --target bun --outdir dist",
+    "build": "bun build src/main -e @nestjs/microservices -e class-validator -e class-transformer -e ts-morph -e @apollo/subgraph --target bun --compile --outfile dist/main --minify",
+    "build:bun": "bun build src/main -e @nestjs/microservices -e class-validator -e class-transformer -e @nestjs/core -e ts-morph -e @apollo/subgraph --target bun --outdir dist",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:novu": "bunx novu@latest dev -p 3000 -d https://nv.binili.net",
