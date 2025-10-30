@@ -19,7 +19,7 @@ export class TiktokScheduler {
       const matchedContent = contents
         .map((c) => ({ ...c, match: this.tiktokUrlPattern(c.link!) }))
         .filter((c) => c.match);
-      const videoMetric = await Promise.all(
+      await Promise.all(
         matchedContent.map(async (c) => ({
           ...c,
           result: await this.tiktokService.getVideoInfo(c.match!.id),

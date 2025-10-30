@@ -4,7 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateContentDto } from './dto/create-content.dto';
+import {
+  CreateContentDto,
+  CreateManualContentDto,
+} from './dto/create-content.dto';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { Content } from 'types';
@@ -73,7 +76,26 @@ export class ContentService {
     return this.prisma.content.findUnique({ where: { id } });
   }
 
-  async createManual() {}
+  async createManual(payload: CreateManualContentDto) {
+    const platformAcc = await this.prisma.platformAccount.findUniqueOrThrow({
+      where: { id: payload.platformAccountId },
+    });
+    const isValid = linkValidator(payload.link, platformAcc.platform);
+    if (!isValid) throw new BadRequestException('Link is not valid!');
+    return this.prisma.feed.create({
+      data: {
+        id: crypto.randomUUID(),
+        threadMemberId: payload.threadMemberId,
+        isManuallyCreated: true,
+        content: {
+          create: {
+            link: payload.link,
+            platformAccountId: payload.platformAccountId,
+          },
+        },
+      },
+    });
+  }
 
   async create(payload: CreateContentDto) {
     const feed = await this.prisma.feed.findUnique({

@@ -122,10 +122,11 @@ model Source {
 }
 
 model Feed {
-  id          String   @id
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  contentMeta Json
+  id                String   @id
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  contentMeta       Json?
+  isManuallyCreated Boolean  @default(false)
 
   threadMemberId    String
   platformAccountId String?

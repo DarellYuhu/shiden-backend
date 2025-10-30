@@ -7,13 +7,16 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ContentService } from './content.service';
-import { CreateContentDto } from './dto/create-content.dto';
+import {
+  CreateContentDto,
+  CreateManualContentDto,
+} from './dto/create-content.dto';
 import {
   AuthGuard,
   Session,
   type UserSession,
 } from '@thallesp/nestjs-better-auth';
+import { ContentService } from './content.service';
 import { UpdateContentDto } from './dto/update-content.dto';
 
 @Controller('contents')
@@ -24,6 +27,11 @@ export class ContentController {
   @Post()
   create(@Body() payload: CreateContentDto) {
     return this.contentService.create(payload);
+  }
+
+  @Post('manual')
+  createManual(@Body() payload: CreateManualContentDto) {
+    return this.contentService.createManual(payload);
   }
 
   @Get()

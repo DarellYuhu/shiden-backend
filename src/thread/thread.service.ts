@@ -55,9 +55,16 @@ export class ThreadService {
   }
 
   async findMany(userId: string) {
-    return this.prisma.thread.findMany({
-      where: { threadMember: { some: { userId } } },
+    const data = await this.prisma.threadMember.findMany({
+      where: { userId },
+      include: { thread: true },
     });
+    const normalized = data.map(({ thread, ...item }) => ({
+      ...item, // item must comes first !!
+      ...thread,
+      threadMemberId: item.id,
+    }));
+    return normalized;
   }
 
   async threadMembers(threadId: string, query: GetMembersQueryDto) {
@@ -68,14 +75,19 @@ export class ThreadService {
           threadMember: {
             include: { user: { select: { name: true, username: true } } },
             where: {
-              user: {
-                OR: [
-                  {
-                    name: { contains: query.search, mode: 'insensitive' },
-                    username: { contains: query.search, mode: 'insensitive' },
-                  },
-                ],
-              },
+              user: query.search
+                ? {
+                    OR: [
+                      {
+                        name: { contains: query.search, mode: 'insensitive' },
+                        username: {
+                          contains: query.search,
+                          mode: 'insensitive',
+                        },
+                      },
+                    ],
+                  }
+                : undefined,
             },
           },
         },

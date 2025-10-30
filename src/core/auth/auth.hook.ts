@@ -3,6 +3,7 @@ import { UserService } from 'src/user/user.service';
 import {
   AfterHook,
   Hook,
+  UserSession,
   type AuthHookContext,
 } from '@thallesp/nestjs-better-auth';
 
@@ -22,14 +23,16 @@ export class AuthHook {
   }
 
   private async createUserHandler(ctx: AuthHookContext) {
-    const session = ctx.context.newSession;
+    const session = ctx.context.newSession as UserSession & {
+      user: { username: string };
+    };
     if (session) {
       const user = await this.userService.findOne(session.user.id);
       if (!user) {
         const payload = {
           id: session.user.id,
           name: session.user.name,
-          username: session.user.username as string,
+          username: session.user.username,
         };
         await this.userService.create(payload);
       }
