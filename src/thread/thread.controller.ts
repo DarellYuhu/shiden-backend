@@ -41,7 +41,7 @@ export class ThreadController {
     return this.threadService.findMany(session.user.id);
   }
 
-  @Delete('/members')
+  @Delete('members')
   deleteThreadMembers(@Query() query: DeleteMembersDto) {
     return this.threadService.deleteThreadMembers(query);
   }
@@ -54,6 +54,11 @@ export class ThreadController {
   @Get(':id/members')
   threadMembers(@Param('id') id: string, @Query() query: GetMembersQueryDto) {
     return this.threadService.threadMembers(id, query);
+  }
+
+  @Get(':id/members/statistic')
+  getMemberStatistic(@Param('id') id: string) {
+    return this.threadService.getMemberStatistic(id);
   }
 
   @Post(':id/members')
@@ -82,12 +87,17 @@ export class ThreadController {
     return this.threadService.addMembers(id, valid);
   }
 
-  @Post(':id/broadcast')
+  @Post(':id/broadcasts')
   createThread(
     @Param('id') id: string,
     @Session() session: UserSession,
     @Body() payload: CreateBroadcastDto,
   ) {
     return this.threadService.createBroadcast(id, session.user.id, payload);
+  }
+
+  @Get(':id/broadcasts/statistic')
+  getBroadcastStatistic(@Param('id') id: string) {
+    return this.threadService.getBroadcastStatistic(id);
   }
 }

@@ -120,6 +120,45 @@ export class ThreadService {
     });
   }
 
+  async getBroadcastStatistic(threadId: string) {
+    const data = await this.prisma.broadcast.findMany({
+      where: { threadId },
+      include: {
+        broadcastInteraction: true,
+        thread: { select: { name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    return data.map(({ broadcastInteraction, thread, ...item }) => ({
+      ...item,
+      threadName: thread.name,
+      clickCount: broadcastInteraction.length,
+    }));
+  }
+
+  async getMemberStatistic(threadId: string) {
+    const data = await this.prisma.threadMember.findMany({
+      where: { threadId },
+      include: {
+        user: { select: { name: true, broadcastInteraction: true } },
+        feed: {
+          where: { content: { isNot: null } },
+          include: { content: true },
+        },
+      },
+    });
+    const normalized = data.map((item) => ({
+      name: item.user.name,
+      postCount: item.feed.length,
+      confirmedPostCount: item.feed.reduce((acc, curr) => {
+        if (curr.content?.link) acc += 1;
+        return acc;
+      }, 0),
+      broadcastInteractionCount: item.user.broadcastInteraction.length,
+    }));
+    return normalized;
+  }
+
   private async checkSources(ids: string[]) {
     const result = await Promise.allSettled(
       ids.map(async (id) => {
