@@ -44,13 +44,16 @@ export class UserService {
   }
 
   async signUpUsersStatistic() {
-    const data = await this.prisma.user.findMany();
-    data.reduce((acc, curr) => {
+    const data = await this.prisma.user.findMany({
+      orderBy: { createdAt: 'asc' },
+    });
+    const registerdUsers = data.reduce((acc, curr) => {
       const key = format(curr.createdAt, 'yyyy-MM-dd');
       if (acc.has(key)) acc.get(key)?.push(curr);
       else acc.set(key, [curr]);
       return acc;
     }, new Map<string, User[]>());
+    return Object.fromEntries(registerdUsers);
   }
 
   async statistics(userId: string) {

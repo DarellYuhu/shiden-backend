@@ -51,6 +51,11 @@ export class ThreadController {
     return this.threadService.findOne(id);
   }
 
+  @Get(':id/posts/statistic')
+  getPostsStatistic(@Param('id') id: string) {
+    return this.threadService.getPostsStatistic(id);
+  }
+
   @Get(':id/members')
   threadMembers(@Param('id') id: string, @Query() query: GetMembersQueryDto) {
     return this.threadService.threadMembers(id, query);

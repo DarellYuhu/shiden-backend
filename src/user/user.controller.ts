@@ -21,7 +21,7 @@ export class UserController {
     return this.userService.statistics(session.user.id);
   }
 
-  @Get('statistics/sign-up-users')
+  @Get('statistics/sign-up')
   signUpUsersStatistic() {
     return this.userService.signUpUsersStatistic();
   }

@@ -120,6 +120,16 @@ export class ThreadService {
     });
   }
 
+  async getPostsStatistic(threadId: string) {
+    const posts = await this.prisma.content.findMany({
+      where: { feed: { threadMember: { threadId } } },
+    });
+    return {
+      post: posts.length,
+      confirmedPost: posts.filter((item) => !!item.link).length,
+    };
+  }
+
   async getBroadcastStatistic(threadId: string) {
     const data = await this.prisma.broadcast.findMany({
       where: { threadId },
