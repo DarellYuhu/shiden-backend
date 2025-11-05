@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { format, subDays } from 'date-fns';
+import { format, startOfMonth, startOfWeek, subDays } from 'date-fns';
 import { Prisma, User } from 'generated/prisma';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { GetStatisticQueryDto } from './dto/get-statistic-query.dto';
 
 @Injectable()
 export class UserService {
@@ -43,14 +44,28 @@ export class UserService {
     }));
   }
 
-  async signUpUsersStatistic() {
+  async signUpUsersStatistic(query: GetStatisticQueryDto) {
     const data = await this.prisma.user.findMany({
+      where: { createdAt: { gte: query.since, lte: query.until } },
       orderBy: { createdAt: 'asc' },
     });
     const registerdUsers = data.reduce((acc, curr) => {
-      const key = format(curr.createdAt, 'yyyy-MM-dd');
-      if (acc.has(key)) acc.get(key)?.push(curr);
-      else acc.set(key, [curr]);
+      let key: Date;
+      switch (query.unit) {
+        case 'week':
+          key = startOfWeek(curr.createdAt);
+          break;
+        case 'month':
+          key = startOfMonth(curr.createdAt);
+          break;
+
+        default:
+          key = curr.createdAt;
+          break;
+      }
+      const keyDate = format(key, 'yyyy-MM-dd');
+      if (acc.has(keyDate)) acc.get(keyDate)?.push(curr);
+      else acc.set(keyDate, [curr]);
       return acc;
     }, new Map<string, User[]>());
     return Object.fromEntries(registerdUsers);

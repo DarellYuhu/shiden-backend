@@ -25,6 +25,7 @@ import { AddMembersSchema } from './dto/add-members-dto';
 import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 import { GetMembersQueryDto } from './dto/get-members-query.dto';
 import { DeleteMembersDto } from './dto/delete-members.dto';
+import { AddSourceDto } from './dto/add-source.dto';
 
 @Controller('threads')
 @UseGuards(AuthGuard)
@@ -46,9 +47,24 @@ export class ThreadController {
     return this.threadService.deleteThreadMembers(query);
   }
 
+  @Delete('/sources/:sourceId')
+  deleteSource(@Param('sourceId') id: string) {
+    return this.threadService.deleteSource(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.threadService.findOne(id);
+  }
+
+  @Post(':id/sources')
+  createSource(@Param('id') id: string, @Body() payload: AddSourceDto) {
+    return this.threadService.createSource(id, payload);
+  }
+
+  @Get(':id/sources')
+  findManySource(@Param('id') id: string) {
+    return this.threadService.findManySource(id);
   }
 
   @Get(':id/posts/statistic')

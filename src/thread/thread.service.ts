@@ -7,6 +7,7 @@ import { AddMembersDto } from './dto/add-members-dto';
 import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 import { GetMembersQueryDto } from './dto/get-members-query.dto';
 import { DeleteMembersDto } from './dto/delete-members.dto';
+import { AddSourceDto } from './dto/add-source.dto';
 
 @Injectable()
 export class ThreadService {
@@ -167,6 +168,21 @@ export class ThreadService {
       broadcastInteractionCount: item.user.broadcastInteraction.length,
     }));
     return normalized;
+  }
+
+  findManySource(threadId: string) {
+    return this.prisma.source.findMany({ where: { threadId } });
+  }
+
+  async createSource(threadId: string, payload: AddSourceDto) {
+    const validSource = await this.checkSources(payload.sources);
+    return this.prisma.source.createMany({
+      data: validSource.map((item) => ({ ...item, threadId })),
+    });
+  }
+
+  deleteSource(sourceId: string) {
+    return this.prisma.source.delete({ where: { id: sourceId } });
   }
 
   private async checkSources(ids: string[]) {

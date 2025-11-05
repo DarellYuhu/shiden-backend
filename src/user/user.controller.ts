@@ -1,10 +1,11 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
   AuthGuard,
   Session,
   type UserSession,
 } from '@thallesp/nestjs-better-auth';
+import { GetStatisticQueryDto } from './dto/get-statistic-query.dto';
 
 @Controller('users')
 @UseGuards(AuthGuard)
@@ -22,8 +23,8 @@ export class UserController {
   }
 
   @Get('statistics/sign-up')
-  signUpUsersStatistic() {
-    return this.userService.signUpUsersStatistic();
+  signUpUsersStatistic(@Query() query: GetStatisticQueryDto) {
+    return this.userService.signUpUsersStatistic(query);
   }
 
   @Get('broadcast')
