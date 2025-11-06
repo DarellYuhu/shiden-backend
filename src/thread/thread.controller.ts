@@ -73,8 +73,11 @@ export class ThreadController {
   }
 
   @Get(':id/tiktok/statistics')
-  getSocialMediaStats(@Param('id') id: string) {
-    return this.threadService.getTiktokStatistic(id);
+  getSocialMediaStats(
+    @Param('id') id: string,
+    @Query() query: GetMembersQueryDto,
+  ) {
+    return this.threadService.getTiktokStatistic(id, query);
   }
 
   @Get(':id/members')

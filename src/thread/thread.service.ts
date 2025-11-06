@@ -8,6 +8,8 @@ import { CreateBroadcastDto } from './dto/create-broadcast.dto';
 import { GetMembersQueryDto } from './dto/get-members-query.dto';
 import { DeleteMembersDto } from './dto/delete-members.dto';
 import { AddSourceDto } from './dto/add-source.dto';
+import { TiktokMetadata } from 'types';
+import { isWithinInterval } from 'date-fns';
 
 @Injectable()
 export class ThreadService {
@@ -131,7 +133,7 @@ export class ThreadService {
     };
   }
 
-  async getTiktokStatistic(threadId: string) {
+  async getTiktokStatistic(threadId: string, query: GetMembersQueryDto) {
     const data = await this.prisma.content.findMany({
       where: {
         platformAccount: { platform: 'TIKTOK' },
@@ -140,11 +142,21 @@ export class ThreadService {
       },
       include: { statistic: true, platformAccount: true },
     });
-    return data.map(({ platformAccount, ...item }) => ({
-      ...item,
-      username: platformAccount.username,
-      platform: platformAccount.platform,
-    }));
+    return data
+      .filter((item) => {
+        if (!query.since || !query.until) return true;
+        return isWithinInterval(
+          new Date(
+            (item.statistic!.other as TiktokMetadata).video.createTime * 1000,
+          ),
+          { start: query.since, end: query.until },
+        );
+      })
+      .map(({ platformAccount, ...item }) => ({
+        ...item,
+        username: platformAccount.username,
+        platform: platformAccount.platform,
+      }));
   }
 
   async getBroadcastStatistic(threadId: string) {
