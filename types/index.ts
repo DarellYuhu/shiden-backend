@@ -20,6 +20,31 @@ export type Content = {
   }[];
 };
 
+export type TiktokMetadata = {
+  author: {
+    uid: string;
+    nickname: string;
+    signature: string;
+  };
+  video: {
+    id: string;
+    description: string;
+    createTime: number;
+    duration: number;
+    comment: number;
+    like: number;
+    download: number;
+    play: number;
+    share: number;
+    forward: number;
+    lose: number;
+    lose_comment: number;
+    whatsapp_share: number;
+    collect: number;
+    repost: number;
+  };
+};
+
 export type NovuPushPayload = {
   target: string[];
   title: string;

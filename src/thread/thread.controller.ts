@@ -47,7 +47,7 @@ export class ThreadController {
     return this.threadService.deleteThreadMembers(query);
   }
 
-  @Delete('/sources/:sourceId')
+  @Delete('sources/:sourceId')
   deleteSource(@Param('sourceId') id: string) {
     return this.threadService.deleteSource(id);
   }
@@ -70,6 +70,11 @@ export class ThreadController {
   @Get(':id/posts/statistic')
   getPostsStatistic(@Param('id') id: string) {
     return this.threadService.getPostsStatistic(id);
+  }
+
+  @Get(':id/tiktok/statistics')
+  getSocialMediaStats(@Param('id') id: string) {
+    return this.threadService.getTiktokStatistic(id);
   }
 
   @Get(':id/members')

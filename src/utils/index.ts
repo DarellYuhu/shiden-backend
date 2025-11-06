@@ -5,7 +5,7 @@ export const linkValidator = (link: string, platform: Platform) => {
   return !!match;
 };
 
-const LinkRegex: Record<Platform, RegExp> = {
+export const LinkRegex: Record<Platform, RegExp> = {
   TIKTOK: /^https?:\/\/(?:www\.)?tiktok\.com\/@([a-zA-Z0-9._]+)\/video\/(\d+)/,
   FACEBOOK:
     /^https?:\/\/(?:www\.)?facebook\.com\/([^/]+)\/posts\/([A-Za-z0-9._-]+)(?:\?.*)?$/,

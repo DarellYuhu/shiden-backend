@@ -131,6 +131,22 @@ export class ThreadService {
     };
   }
 
+  async getTiktokStatistic(threadId: string) {
+    const data = await this.prisma.content.findMany({
+      where: {
+        platformAccount: { platform: 'TIKTOK' },
+        feed: { threadMember: { threadId } },
+        statistic: { isNot: null },
+      },
+      include: { statistic: true, platformAccount: true },
+    });
+    return data.map(({ platformAccount, ...item }) => ({
+      ...item,
+      username: platformAccount.username,
+      platform: platformAccount.platform,
+    }));
+  }
+
   async getBroadcastStatistic(threadId: string) {
     const data = await this.prisma.broadcast.findMany({
       where: { threadId },

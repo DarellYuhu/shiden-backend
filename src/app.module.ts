@@ -18,6 +18,7 @@ import { ContentModule } from './content/content.module';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { NotificationModule } from './notification/notification.module';
 import { BroadcastModule } from './broadcast/broadcast.module';
+import { TiktokModule } from './tiktok/tiktok.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { BroadcastModule } from './broadcast/broadcast.module';
     MinioModule,
     NotificationModule,
     BroadcastModule,
+    TiktokModule,
     MulterModule.register({ limits: { fileSize: 5 * 1024 * 1024 } }),
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
